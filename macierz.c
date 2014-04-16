@@ -60,8 +60,8 @@ int main(int argc, char *argv[]){
 //POCZĄTEK POMIARU DLA OBLICZEŃ;
 	start=clock();
 	for(i=0;i<sizeA;i++){
-		for(j=0;j<sizeA;j++){
-			C[i]+=A[j*sizeA+i]*B[j];
+		for(j=0;j<sizeB;j++){
+			C[i]+=A[i*sizeA+j]*B[i];
 		}
 	}
 //KONIC POMIARU DLA OBLICZEŃ
@@ -71,7 +71,7 @@ int main(int argc, char *argv[]){
 
 //Wydruk wektora
 	start=clock();
-	for(i=0;i<sizeA;i++){
+	for(i=0;i<sizeB;i++){
 		printf("%d ",C[i]);
 	}
 	printf("\n");
