@@ -1,11 +1,14 @@
 #include <stdio.h>
+#include <string.h>
 #include <stdlib.h>
 #include <math.h> //z flagą -lm na końcu polecenia
 #include <time.h> //z flagą -lrt
+//dane - macierz[4500x3000] - wektor[4500]
 //KOMPILACJA gcc macierz.c -lrt -lm
-int main(){
+int main(int argc, char *argv[]){
 	int j,l;//zmienne pomocnicze
-	int size=0;//wielkość macierzy
+	int sizeA=atoi(argv[1]);//szerokość macierzy
+	int sizeB=atoi(argv[2]);//wysokość macierzy
 	int i=0;
 	clock_t start, stop;
 	double timeI,timeO,timeZ;
@@ -17,43 +20,35 @@ int main(){
 		printf("Nie mogę otworzyć pliku\n");
 	}
 	//printf("Otworzyłem plik\n");
-	while(fscanf(plik,"%d",&l)!=EOF){
-		size++;
-	}
-	//printf("Plik zawiera %d liczb.\n",size);
 //rezerwacja pamięci na macierz
-	A = (int*)malloc(sizeof(int)*size);	
+	A = (int*)malloc(sizeA*sizeB*sizeof(int*));	
 	//printf("Zająłem miejsce dla A\n");
-	rewind(plik);
 	while(fscanf(plik,"%d",&A[i])!=EOF){
 		i++;
 	}
-
 //Wydruk testowy A
-	//for(i=0;i<size;i++){
-	//	printf("A[%d]=%d, ",i,A[i]);	
+	//for(i=0;i<sizeA;i++){
+	//	for(j=0;j<sizeB;j++){
+	//		printf("A[%d,%d]=%d, ",i,j,A[i+j]);
+	//	}
 	//}
-	int temp; //wielkość wektora
-	temp=sqrt(size);
-	//printf("temp=%d \n",temp);
 //WEKTOR
-	//WYGENEROWAĆ WEKTOR RANDEM DO TABLICY OD TEMP BEZ OTWIERANIA PLIKU
-	//PORÓWNAĆ CZASY!!!
 	int *B, *C;//wektor i wynik
 	if((plik=fopen("wektor.txt","r"))==0){
 		printf("Nie mogę otworzyć pliku\n");
 	}
 	//printf("Otworzyłem plik WEKTOR\n");
-	B = (int*)malloc(sizeof(int)*temp);	//wektor
-	C = (int*)malloc(sizeof(int)*temp); //wynik
+	B = (int*)malloc(sizeof(int)*sizeA);	//wektor
+	C = (int*)malloc(sizeof(int)*sizeA); //wynik
 	i=0;
 	while(fscanf(plik,"%d",&B[i])!=EOF){
 		i++;
 	}
+
 //KONIEC POMIARU IO
 	stop=clock();
 	timeI=(double)(stop-start)/(CLOCKS_PER_SEC);
-	printf("Czas wczytania plików=%2.5f\n",timeI);
+	//printf("Czas wczytania plików=%2.5f\n",timeI);
 //Wydruk testowy B
 	//for(i=0;i<temp;i++){
 	//	printf("%d ",B[i]);
@@ -64,19 +59,19 @@ int main(){
 //n=size
 //POCZĄTEK POMIARU DLA OBLICZEŃ;
 	start=clock();
-	for(i=0;i<temp;i++){
-		for(j=0;j<temp;j++){
-			C[i]+=A[j*temp+i]*B[j];
+	for(i=0;i<sizeA;i++){
+		for(j=0;j<sizeA;j++){
+			C[i]+=A[j*sizeA+i]*B[j];
 		}
 	}
 //KONIC POMIARU DLA OBLICZEŃ
 	stop=clock();
 	timeZ=(double)(stop-start)/(CLOCKS_PER_SEC);
-	printf("Czas obliczeń %2.5f\n",timeZ);
+	//printf("Czas obliczeń %2.5f\n",timeZ);
 
 //Wydruk wektora
 	start=clock();
-	for(i=0;i<temp;i++){
+	for(i=0;i<sizeA;i++){
 		printf("%d ",C[i]);
 	}
 	printf("\n");
