@@ -8,12 +8,18 @@ int main(int argc, char *argv[]){
 	int sizeA=atoi(argv[1]);//szerokość macierzy
 	int sizeB=atoi(argv[2]);//wysokość macierzy
 	int i=0;
-	clock_t start, stop;
+	double timespecDiff(struct timespec *timeA_p, struct timespec *timeB_p) {
+        double diff =
+            (((timeA_p->tv_sec * 1000000000) + timeA_p->tv_nsec) -
+             ((timeB_p->tv_sec * 1000000000) + timeB_p->tv_nsec));
+        return diff / 1000000000;
+    }
+    struct timespec start, end;
 	double timeI,timeO,timeZ;
 	FILE *plik;
 	int *A;//macierz
 //POCZĄTEK POMIARU DLA IO;
-	start=clock();
+	clock_gettime(CLOCK_MONOTONIC, &start);
 	if((plik=fopen("dane.txt","r"))==0){
 		printf("Nie mogę otworzyć pliku\n");
 	}
@@ -44,8 +50,8 @@ int main(int argc, char *argv[]){
 	}
 
 //KONIEC POMIARU IO
-	stop=clock();
-	timeI=(double)(stop-start)/(CLOCKS_PER_SEC);
+	clock_gettime(CLOCK_MONOTONIC, &end);
+	timeI=timespecDiff(&end, &start);
 	//printf("Czas wczytania plików=%2.5f\n",timeI);
 //Wydruk testowy B
 	//for(i=0;i<temp;i++){
@@ -56,7 +62,7 @@ int main(int argc, char *argv[]){
 //		   c[n]=a[n][0]*b[0]+a[n][1]*b[1]+...+a[n][j]*b[j]+...+a[n][n]*b[n]
 //n=size
 //POCZĄTEK POMIARU DLA OBLICZEŃ;
-	start=clock();
+	clock_gettime(CLOCK_MONOTONIC, &start);
 
 #pragma omp parallel for private(i,j), reduction(+ : C[i])
 	for(i=0;i<sizeA;i++){
@@ -65,25 +71,25 @@ int main(int argc, char *argv[]){
 		}
 	}
 //KONIC POMIARU DLA OBLICZEŃ
-	stop=clock();
-	timeZ=(double)(stop-start)/(CLOCKS_PER_SEC);
+	clock_gettime(CLOCK_MONOTONIC, &end);
+	timeZ=timespecDiff(&end, &start);
 	//printf("Czas obliczeń %2.5f\n",timeZ);
 
 //Wydruk wektora
-	start=clock();
+	clock_gettime(CLOCK_MONOTONIC, &start);
 #pragma omp parallel for	
 	for(i=0;i<sizeB;i++){
 		printf("%d ",C[i]);
 	}
 	printf("\n");
-	stop=clock();
-	timeO=(double)(stop-start)/(CLOCKS_PER_SEC);
+	clock_gettime(CLOCK_MONOTONIC, &end);
+	timeO=timespecDiff(&end, &start);
 //WYDRUK CZASÓW
-	printf("Czas wczytania: %2.2f s\n",timeI);
-	printf("Czas obliczeń: %2.2f s\n",timeZ);
-	printf("Czas zapisu: %2.2f s\n",timeO);
-	printf("Czas operacji IO=%2.2f s\n",timeI+timeO);
-	printf("Czas całkowity=%2.2f s\n",timeI+timeO+timeZ);
+	printf("Czas wczytywania:  %.10f s\n",timeI);
+	printf("Czas obliczeń: %.10f s\n",timeZ);
+	printf("Czas zapisu: %.10f s\n",timeO);
+	printf("Czas operacji IO=%.10f s\n",timeI+timeO);
+	printf("Czas całkowity=%.10f s\n",timeI+timeO+timeZ);
 //uwolnienie pamięci, zamknięcie pliku
 	free(A);
 	free(B);
