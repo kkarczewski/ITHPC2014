@@ -1,10 +1,8 @@
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
-#include <math.h> //z flagą -lm na końcu polecenia
 #include <time.h> //z flagą -lrt
-//dane - macierz[4500x3000] - wektor[4500]
-//KOMPILACJA gcc macierz.c -lrt -lm
+#include <omp.h>
+//KOMPILACJA gcc macierz.c -lrt
 int main(int argc, char *argv[]){
 	int j,l;//zmienne pomocnicze
 	int sizeA=atoi(argv[1]);//szerokość macierzy
@@ -59,9 +57,11 @@ int main(int argc, char *argv[]){
 //n=size
 //POCZĄTEK POMIARU DLA OBLICZEŃ;
 	start=clock();
+
+#pragma omp parallel for private(i,j), reduction(+ : C[i])
 	for(i=0;i<sizeA;i++){
 		for(j=0;j<sizeB;j++){
-			C[i]+=A[i*sizeA+j]*B[i];
+			C[i]=C[i]+A[i*sizeA+j]*B[i];
 		}
 	}
 //KONIC POMIARU DLA OBLICZEŃ
@@ -71,6 +71,7 @@ int main(int argc, char *argv[]){
 
 //Wydruk wektora
 	start=clock();
+#pragma omp parallel for	
 	for(i=0;i<sizeB;i++){
 		printf("%d ",C[i]);
 	}

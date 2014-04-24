@@ -1,9 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
-int main(){
-	int i,j,sizeA,sizeB;
-	scanf("%d",&sizeA);
-	scanf("%d",&sizeB);
+int main(int argc, char *argv[]){
+	int i,j;
+	int sizeA=atoi(argv[1]);//szerokość macierzy
+	int sizeB=atoi(argv[2]);//wysokość macierzy
 	int* A = (int*)malloc(sizeA*sizeB*sizeof(int*));	
 	srand(1);
 	for(i=0;i<sizeA;i++){
