@@ -10,8 +10,8 @@ int main(int argc, char *argv[]){
 	int i=0;
 	double timespecDiff(struct timespec *timeA_p, struct timespec *timeB_p) {
         double diff =
-            (((timeA_p->tv_sec * 1000000000) + timeA_p->tv_nsec) -
-             ((timeB_p->tv_sec * 1000000000) + timeB_p->tv_nsec));
+            ((((double)timeA_p->tv_sec * 1000000000) + timeA_p->tv_nsec) -
+             (((double)timeB_p->tv_sec * 1000000000) + timeB_p->tv_nsec));
         return diff / 1000000000;
     }
     struct timespec start, end;
@@ -33,7 +33,6 @@ int main(int argc, char *argv[]){
 	if((plik=fopen("wektor.txt","r"))==0){
 		printf("Nie mogę otworzyć pliku\n");
 	}
-	//printf("Otworzyłem plik WEKTOR\n");
 	B = (int*)malloc(sizeof(int)*sizeA);	//wektor
 	C = (int*)malloc(sizeof(int)*sizeA); //wynik
 	i=0;
@@ -49,19 +48,15 @@ int main(int argc, char *argv[]){
 //		   c[n]=a[n][0]*b[0]+a[n][1]*b[1]+...+a[n][j]*b[j]+...+a[n][n]*b[n]
 //POCZĄTEK POMIARU DLA OBLICZEŃ;
 	clock_gettime(CLOCK_MONOTONIC, &start);
-int temp=0;
-	//#pragma omp parallel for private(i,j), reduction(+ : temp)
-	#pragma omp parallel for default(shared) private(temp,i,j)  
+	#pragma omp parallel for default(shared) private(i,j)  
 	for(i=0;i<sizeA;i++){
 		for(j=0;j<sizeB;j++){
 			C[i]+=A[i*sizeA+j]*B[i];
 		}
-//		C[i]=temp;
 	}
-//KONIC POMIARU DLA OBLICZEŃ
+//KONIEC POMIARU DLA OBLICZEŃ
 	clock_gettime(CLOCK_MONOTONIC, &end);
 	timeZ=timespecDiff(&end, &start);
-	//printf("Czas obliczeń %2.5f\n",timeZ);
 
 //Wydruk wektora
 	clock_gettime(CLOCK_MONOTONIC, &start);
