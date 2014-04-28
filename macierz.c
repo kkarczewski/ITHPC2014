@@ -34,7 +34,7 @@ int main(int argc, char *argv[]){
 		printf("Nie mogę otworzyć pliku\n");
 	}
 	B = (int*)malloc(sizeof(int)*sizeA);	//wektor
-	C = (int*)malloc(sizeof(int)*sizeA); //wynik
+	C = (int*)malloc(sizeof(int)*sizeB); //wynik
 	i=0;
 	while(fscanf(plik,"%d",&B[i])!=EOF){
 		i++;
@@ -46,11 +46,14 @@ int main(int argc, char *argv[]){
 //mnożenie c[0]=a[0][0]*b[0]+a[0][1]*b[1]+...+a[0][j]*b[j]+...+a[0][n]*b[n]
 //		   c[i]=a[i][0]*b[0]+a[i][1]*b[1]+...+a[i][j]*b[j]+...+a[0][n]*b[n]
 //		   c[n]=a[n][0]*b[0]+a[n][1]*b[1]+...+a[n][j]*b[j]+...+a[n][n]*b[n]
+for(i=0;i<sizeB;i++){
+	C[i]=0;
+}
 //POCZĄTEK POMIARU DLA OBLICZEŃ;
 	clock_gettime(CLOCK_MONOTONIC, &start);
 	#pragma omp parallel for default(shared) private(i,j)  
-	for(i=0;i<sizeA;i++){
-		for(j=0;j<sizeB;j++){
+	for(i=0;i<sizeB;i++){
+		for(j=0;j<sizeA;j++){
 			C[i]+=A[i*sizeA+j]*B[i];
 		}
 	}
@@ -60,7 +63,6 @@ int main(int argc, char *argv[]){
 
 //Wydruk wektora
 	clock_gettime(CLOCK_MONOTONIC, &start);
-#pragma omp parallel for	
 	for(i=0;i<sizeB;i++){
 		printf("%d ",C[i]);
 	}
